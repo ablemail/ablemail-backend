@@ -9,16 +9,19 @@ passport.deserializeUser((id, done) => {
   User.findById(id).then(user => done(null, user));
 });
 
-passport.use(new GoogleStrategy(google, (accessToken, refreshToken, profile, done) => {
-  console.log(profile);
+const accessToken = new Promise(resolve => passport.use(new GoogleStrategy(google, (accessToken, refreshToken, profile, done) => {
   User.findOne({ googleID: profile.id }).then(currentUser => {
     if (currentUser) {
       done(null, currentUser);
     } else {
       new User({
         name: profile.displayName,
-        googleID: profile.id
+        googleID: profile.id,
+        email: profile.emails[0].value
       }).save().then(newUser => done(null, newUser));
     }
   });
-}));
+  resolve(accessToken);
+})));
+
+module.exports = accessToken;

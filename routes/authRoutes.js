@@ -1,28 +1,23 @@
 const router = require('express').Router();
-const { key } = require('../config/key.json');
 const passport = require('passport');
 const passportSetup = require('../passport');
-
-const verifyKey = (req, res, next) => {
-  if (req.query.key === key) {
-    next();
-  } else {
-    res.redirect('/');
-  }
-};
+const verifyKey = require('../middleware/verifyKey');
 
 router.get('/', verifyKey, (req, res) => {
-  switch (req.query.email.split('@')[1]) {
-    case 'gmail.com':
+  switch (req.query.provider) {
+    case 'google':
       res.redirect('/auth/google');
       break;
+    default:
+      res.redirect('http://localhost:3000');
   }
 });
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email', 'https://mail.google.com/'] }));
 
-router.get('/google/callback', passport.authenticate('google'), (req, res) => {
-  res.send('yeet')
-});
+const user = new Promise(resolve => router.get('/google/callback', passport.authenticate('google'), (req, res) => {
+  resolve(req.user);
+  res.redirect('http://localhost:3000/inbox');
+}));
 
-module.exports = router;
+module.exports = { authRoutes: router, user };
