@@ -6,7 +6,7 @@ const cookieSession = require('cookie-session');
 const { key } = require('./config/key.json');
 const passport = require('passport');
 
-const { authRoutes } = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
 const getMailRoute = require('./routes/getMailRoute');
 
 const app = express();

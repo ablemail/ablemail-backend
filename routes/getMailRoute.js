@@ -1,28 +1,42 @@
 const router = require('express').Router();
 const axios = require('axios');
 const { google } = require('../config/apis.json');
-const accessToken = require('../passport');
 const verifyKey = require('../middleware/verifyKey');
-const { user } = require('./authRoutes');
 
 router.get('/', verifyKey, async (req, res) => {
-  const email = (await user).email;
-  const token = await accessToken;
-  const data = await axios.get(`https://www.googleapis.com/gmail/v1/users/${ email }/messages?key=${ google.clientSecret }`, {
+  const data = await axios.get(`https://www.googleapis.com/gmail/v1/users/me/messages?key=${ google.clientSecret }`, {
     headers: {
       Accept: 'application/json',
-      Authorization: `Bearer ${ token }`
+      Authorization: `Bearer ${ req.query.token }`
     }
   });
 
   let messages = [];
-  data.data.messages.forEach(message => messages.push(axios.get(`https://www.googleapis.com/gmail/v1/users/${ email }/messages/${ message.id }?key=${ google.clientSecret }`, {
+  let temp = 0;
+  for (const message of data.data.messages) {
+    const m = await axios.get(`https://www.googleapis.com/gmail/v1/users/me/messages/${ message.id }?key=${ google.clientSecret }`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${ req.query.token }`
+      }
+    });
+    messages.push(m.data);
+    if (temp === 5) {
+      break;
+    } else {
+      temp++;
+    }
+  }
+  res.json(messages);
+});
+
+router.get('/get-one', verifyKey, async (req, res) => {
+  res.json(await axios.get(`https://www.googleapis.com/gmail/v1/users/me/messages/${ req.query.id }?key=${ google.clientSecret }`, {
     headers: {
       Accept: 'application/json',
-      Authorization: `Bearer ${ token }`
+      Authorization: `Bearer ${ req.query.token }`
     }
-  })));
-  res.json(messages);
+  }));
 });
 
 module.exports = router;
