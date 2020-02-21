@@ -8,24 +8,38 @@ router.get('/', verifyKey, async (req, res) => {
   switch (req.query.provider) {
     case 'google':
       const raw = await User.findOne({ email: req.query.email });
-      const user = raw ? raw : { email: req.query.email };
-      user.password = req.query.pass;
-      await User.findOneAndUpdate({ email: req.query.email }, user, { upsert: true, useFindAndModify: false });
-      res.redirect('/auth/google');
+      const user = raw ? raw : { email: req.query.email, password: null };
+      if (raw && req.query.pass !== user.password) {
+        res.json({ message: 'failed auth' });
+      } else {
+        user.password = req.query.pass;
+        await User.findOneAndUpdate({ email: req.query.email }, user, { upsert: true, useFindAndModify: false });
+        res.redirect('/auth/google');
+      }
       break;
     default:
-      User.findOne({ email: req.query.email }).then( currentUser => {
+      User.findOne({ email: req.query.email, password: req.query.pass }).then( currentUser => {
         if (currentUser) {
           res.json({ id: currentUser.id });
         } else {
-          new User({
-            name: `${ req.query.first } ${ req.query.last }`,
-            email: req.query.email,
-            password: req.query.pass
-          }).save().then(newUser => res.json({ id: newUser.id }));
+          res.json({ id: null, message: 'failed auth' });
         }
       });
   }
+});
+
+router.get('/signup', verifyKey, (req, res) => {
+  User.findOne({ email: req.query.email }).then( currentUser => {
+    if (currentUser) {
+      res.json({ id: currentUser.id });
+    } else {
+      new User({
+        name: `${ req.query.first } ${ req.query.last }`,
+        email: req.query.email,
+        password: req.query.pass
+      }).save().then(newUser => res.json({ id: newUser.id }));
+    }
+  });
 });
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email', 'https://mail.google.com/'] }));
