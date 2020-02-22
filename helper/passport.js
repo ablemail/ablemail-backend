@@ -3,12 +3,14 @@ const GoogleStrategy = require('passport-google-oauth20');
 const LocalStrategy = require('passport-local');
 const { google } = require('../config/apis.json');
 const User = require('../models/user');
+const CryptoJS = require('crypto-js');
+const { cipherKey } = require('../config/key.json');
 
-passport.serializeUser((user, done) => done(null, user.user.id));
+const verifyPassword = (savedPass, password) => password === CryptoJS.AES.decrypt(savedPass, cipherKey).toString(CryptoJS.enc.Utf8);
 
-passport.deserializeUser((id, done) => {
-  User.findById(id).then(user => done(null, user));
-});
+passport.serializeUser((user, done) => done(null, user.id));
+
+passport.deserializeUser((id, done) => User.findById(id).then(user => done(null, user)));
 
 passport.use('google', new GoogleStrategy(google, (accessToken, refreshToken, profile, done) => {
   User.findOne({ email: profile.emails[0].value }).then(async currentUser => {
@@ -27,11 +29,12 @@ passport.use('google', new GoogleStrategy(google, (accessToken, refreshToken, pr
   });
 }));
 
-passport.use('local', new LocalStrategy((email, password, done) => {
-  User.findOne({ email}).then((err, user) => {
-    if (err) { return done(err); }
-    if (!user) { return done(null, false); }
-    if (!user.verifyPassword(password)) { return done(null, false); }
+passport.use('local', new LocalStrategy((username, password, done) => {
+  User.findOne({ email: username }).then(user => {
+    if (!user) return done(null, false);
+    if (!verifyPassword(user.password, password)) return done(null, false);
     return done(null, user);
   });
 }));
+
+module.exports = verifyPassword;

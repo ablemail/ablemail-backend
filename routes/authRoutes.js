@@ -1,46 +1,49 @@
 const router = require('express').Router();
 const passport = require('passport');
-const passportSetup = require('../helper/passport');
 const verifyKey = require('../middleware/verifyKey');
 const User = require('../models/user');
+const CryptoJS = require('crypto-js');
+const { cipherKey } = require('../config/key.json');
+const verifyPassword = require('../helper/passport');
+const axios = require('axios');
 
 router.get('/', verifyKey, async (req, res) => {
   switch (req.query.provider) {
     case 'google':
       const raw = await User.findOne({ email: req.query.email });
       const user = raw ? raw : { email: req.query.email, password: null };
-      if (raw && req.query.pass !== user.password) {
-        res.json({ message: 'failed auth' });
+      if (raw && !verifyPassword(user.password, req.query.pass)) {
+        res.redirect(`http://localhost:3000/signin/failure`);
       } else {
-        user.password = req.query.pass;
+        user.password = CryptoJS.AES.encrypt(req.query.pass, cipherKey).toString();
         await User.findOneAndUpdate({ email: req.query.email }, user, { upsert: true, useFindAndModify: false });
         res.redirect('/auth/google');
       }
       break;
     default:
-      User.findOne({ email: req.query.email, password: req.query.pass }).then( currentUser => {
-        if (currentUser) {
-          res.json({ id: currentUser.id });
-        } else {
-          res.json({ id: null, message: 'failed auth' });
-        }
-      });
+      // const data = await axios.post('http://localhost:8000/auth/other', {
+      //   username: req.query.email,
+      //   password: req.query.pass
+      // }).catch(e => res.send(e.response.data));
   }
 });
 
 router.get('/signup', verifyKey, (req, res) => {
-  User.findOne({ email: req.query.email }).then( currentUser => {
+  User.findOne({ email: req.query.email }).then(async currentUser => {
     if (currentUser) {
-      res.json({ id: currentUser.id });
+      res.redirect(`http://localhost:3000/signin/signup`);
     } else {
       new User({
         name: `${ req.query.first } ${ req.query.last }`,
         email: req.query.email,
-        password: req.query.pass
-      }).save().then(newUser => res.json({ id: newUser.id }));
+        password: CryptoJS.AES.encrypt(req.query.pass, cipherKey).toString()
+      }).save().then(newUser => res.redirect(`http://localhost:3000/inbox/${ newUser.id }`));
     }
   });
 });
+
+router.post('/other', passport.authenticate('local', { failureRedirect: 'http://localhost:3000/signin/failure' }), (req, res) => res.json(req.user.id));
+
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email', 'https://mail.google.com/'] }));
 

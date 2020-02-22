@@ -4,6 +4,8 @@ const { google } = require('../config/apis.json');
 const verifyKey = require('../middleware/verifyKey');
 const imap = require('../helper/imap');
 const User = require('../models/user');
+const CryptoJS = require('crypto-js');
+const { cipherKey } = require('../config/key.json');
 
 router.get('/google', verifyKey, async (req, res) => {
   const data = await axios.get(`https://www.googleapis.com/gmail/v1/users/me/messages?key=${ google.clientSecret }`, {
@@ -43,7 +45,7 @@ router.get('/', verifyKey, async (req, res) => {
   const user = await User.findById(req.query.id);
   const mail = await imap({
     user: user.email,
-    password: user.password,
+    password: CryptoJS.AES.decrypt(user.password, cipherKey).toString(CryptoJS.enc.Utf8),
     host: 'outlook.office365.com', // TODO: Add question for this on client side
     port: 993, // TODO: Also this but default to port 993
     tls: true

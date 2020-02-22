@@ -5,6 +5,7 @@ const { mongodb } = require('./config/apis.json');
 const cookieSession = require('cookie-session');
 const { key } = require('./config/key.json');
 const passport = require('passport');
+var bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/authRoutes');
 const getMailRoute = require('./routes/getMailRoute');
@@ -21,6 +22,8 @@ app.use(cookieSession({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect(mongodb.uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
