@@ -21,10 +21,7 @@ router.get('/', verifyKey, async (req, res) => {
       }
       break;
     default:
-      // const data = await axios.post('http://localhost:8000/auth/other', {
-      //   username: req.query.email,
-      //   password: req.query.pass
-      // }).catch(e => res.send(e.response.data));
+      break;
   }
 });
 
@@ -42,7 +39,16 @@ router.get('/signup', verifyKey, (req, res) => {
   });
 });
 
-router.post('/other', passport.authenticate('local', { failureRedirect: 'http://localhost:3000/signin/failure' }), (req, res) => res.json(req.user.id));
+router.post('/other', (req, res, next) => {
+  passport.authenticate('local', (err, user) => {
+    if (err) return next(err);
+    if (!user.user) return res.json({ message: 'failed to auth' });
+    req.logIn(user, err => {
+      if (err) return next(err);
+      return res.json(req.user.user.id);
+    });
+  })(req, res, next);
+});
 
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email', 'https://mail.google.com/'] }));

@@ -8,7 +8,7 @@ const { cipherKey } = require('../config/key.json');
 
 const verifyPassword = (savedPass, password) => password === CryptoJS.AES.decrypt(savedPass, cipherKey).toString(CryptoJS.enc.Utf8);
 
-passport.serializeUser((user, done) => done(null, user.id));
+passport.serializeUser((user, done) => done(null, user.user.id));
 
 passport.deserializeUser((id, done) => User.findById(id).then(user => done(null, user)));
 
@@ -24,7 +24,7 @@ passport.use('google', new GoogleStrategy(google, (accessToken, refreshToken, pr
       new User({
         name: profile.displayName,
         email: profile.emails[0].value
-      }).save().then(newUser => done(null, { user: newUser, accessToken }));
+      }).save().then(newUser => done(null, newUser));
     }
   });
 }));
@@ -33,7 +33,7 @@ passport.use('local', new LocalStrategy((username, password, done) => {
   User.findOne({ email: username }).then(user => {
     if (!user) return done(null, false);
     if (!verifyPassword(user.password, password)) return done(null, false);
-    return done(null, user);
+    return done(null, { user });
   });
 }));
 
