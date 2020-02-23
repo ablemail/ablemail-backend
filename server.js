@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect(mongodb.uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-app.get('/', (req, res) => res.send(''));
+app.get('/', (req, res) => res.redirect('http://localhost:3000'));
 
 app.use('/auth', authRoutes);
 app.use('/get-mail', getMailRoute);
