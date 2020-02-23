@@ -5,7 +5,6 @@ const User = require('../models/user');
 const CryptoJS = require('crypto-js');
 const { cipherKey } = require('../config/key.json');
 const verifyPassword = require('../helper/passport');
-const axios = require('axios');
 
 router.get('/', verifyKey, async (req, res) => {
   switch (req.query.provider) {
