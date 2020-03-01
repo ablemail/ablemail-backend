@@ -1,12 +1,9 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const LocalStrategy = require('passport-local');
-const { google } = require('../config/apis.json');
+const { google } = require('../config/config.json');
 const User = require('../models/user');
-const CryptoJS = require('crypto-js');
-const { cipherKey } = require('../config/key.json');
-
-const verifyPassword = (savedPass, password) => password === CryptoJS.AES.decrypt(savedPass, cipherKey).toString(CryptoJS.enc.Utf8);
+const verifyPassword = require('./verifyPassword');
 
 passport.serializeUser((user, done) => done(null, user.user.id));
 

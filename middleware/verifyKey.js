@@ -1,10 +1,10 @@
-const { key } = require('../config/key.json');
+const { keys, client } = require('../config/config.json');
 
 const verifyKey = (req, res, next) => {
-  if (req.query.key === key) {
+  if (decodeURI(req.query.key) === keys.reqKey) {
     next();
   } else {
-    res.redirect('/');
+    res.redirect(client);
   }
 };
 
