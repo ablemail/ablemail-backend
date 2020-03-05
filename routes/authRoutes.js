@@ -27,7 +27,7 @@ router.get('/signup', verifyKey, (req, res) => {
   });
 });
 
-router.post('/other', (req, res, next) => passport.authenticate('local', (err, user) => {
+router.post('/other', (req, res, next) => passport.authenticate('local', (err, user) => { // TODO: Add key
   if (err) return next(err);
   if (!user.user) return res.json({ message: 'failed to auth' });
   req.logIn(user, err => {
