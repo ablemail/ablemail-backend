@@ -32,16 +32,8 @@ const createTransport = async userID => {
     case 'catlin.edu': // TODO: Remove
       config = {
         host: 'smtp.office365.com',
-        port: 465,
-        secureConnection: false,
-        secure: true,
-        ignoreTLS: false,
-        requireTLS: true,
-        auth,
-        tls: {
-          rejectUnauthorized: false,
-          ciphers: 'SSLv3'
-        }
+        port: 587,
+        auth
       };
       break;
   }
@@ -53,15 +45,12 @@ const sendMail = async (id, transport, mail) => {
   const user = await User.findById(id);
   if (!user) console.error('No user found');
 
-  console.log({
-    ...mail,
-    from: `"${ user.name }" ${ user.email }`
-  });
-
-  transport.sendMail({
+  await transport.sendMail({
     from: `"${ user.name }" ${ user.email }`,
     ...mail
-  }).then(() => console.log('sent'));
+  });
+  transport.close();
+  return { sent: true };
 };
 
 module.exports = { createTransport, sendMail };
