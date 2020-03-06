@@ -39,3 +39,5 @@ router.get('/get-one', verifyKey, async (req, res) => {
     }
   }))
 });
+
+module.exports = router;
