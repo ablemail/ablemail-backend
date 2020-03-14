@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const verifyKey = require('../middleware/verifyKey');
+const verifyHost = require('../middleware/verifyHost');
 const imap = require('../helper/imap');
 const User = require('../models/user');
 const CryptoJS = require('crypto-js');
@@ -10,7 +10,7 @@ const googleGetMailRoutes = require('./google/googleGetMailRoutes');
 
 router.use('/google', googleGetMailRoutes);
 
-router.get('/', verifyKey, async (req, res) => {
+router.get('/', verifyHost, async (req, res) => {
   const query = decodeQuery(req.query);
   const user = await User.findById(query.id);
   const mail = await imap({

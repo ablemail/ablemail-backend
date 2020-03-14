@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const passport = require('passport');
-const verifyKey = require('../middleware/verifyKey');
+const verifyHost = require('../middleware/verifyHost');
 const User = require('../models/user');
 const CryptoJS = require('crypto-js');
 const { client, keys } = require('../config/config.json');
@@ -12,7 +12,7 @@ require('../helper/passport');
 
 router.use('/google', googleAuthRoutes);
 
-router.get('/signup', verifyKey, (req, res) => {
+router.get('/signup', verifyHost, (req, res) => {
   const query = decodeQuery(req.query);
   User.findOne({ email: query.email }).then(async currentUser => {
     if (currentUser) {

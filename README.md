@@ -10,10 +10,10 @@ Signs up a new non-Google user and generates a session.
 
 ##### Query
 
-|                 `key`                 |                         `email`                          |      `pass`      |      `first`       |      `pass`       |
-| :-----------------------------------: | :------------------------------------------------------: | :--------------: | :----------------: | :---------------: |
-|                String                 |                          String                          |      String      |       String       |      String       |
-| A key that authorizes the connection. | User's email. Make sure it does not end in `@gmail.com`. | User's password. | User's first name. | User's last name. |
+|                         `email`                          |      `pass`      |      `first`       |      `pass`       |
+| :------------------------------------------------------: | :--------------: | :----------------: | :---------------: |
+|                          String                          |      String      |       String       |      String       |
+| User's email. Make sure it does not end in `@gmail.com`. | User's password. | User's first name. | User's last name. |
 
 #### GET `/auth/google`
 
@@ -21,10 +21,10 @@ Authorizes a Google user
 
 ##### Query
 
-|                 `key`                 |                         `email`                          |      `pass`      |
-| :-----------------------------------: | :------------------------------------------------------: | :--------------: |
-|                String                 |                          String                          |      String      |
-| A key that authorizes the connection. | User's email. Make sure it does not end in `@gmail.com`. | User's password. |
+|                         `email`                          |      `pass`      |
+| :------------------------------------------------------: | :--------------: |
+|                          String                          |      String      |
+| User's email. Make sure it does not end in `@gmail.com`. | User's password. |
 
 #### GET `/auth/google/redirect`
 
@@ -51,10 +51,10 @@ Gets last 6 messages from Google.
 
 ##### Query
 
-|                 `key`                 |       `token`        |
-| :-----------------------------------: | :------------------: |
-|                String                 |        String        |
-| A key that authorizes the connection. | Google access token. |
+|       `token`        |
+| :------------------: |
+|        String        |
+| Google access token. |
 
 #### GET `/get-mail/google/get-one`
 
@@ -62,10 +62,10 @@ Gets one specific message.
 
 ##### Query
 
-|                 `key`                 |       `token`        |        `id`        |
-| :-----------------------------------: | :------------------: | :----------------: |
-|                String                 |        String        |       String       |
-| A key that authorizes the connection. | Google access token. | Google message ID. |
+|       `token`        |        `id`        |
+| :------------------: | :----------------: |
+|        String        |       String       |
+| Google access token. | Google message ID. |
 
 #### GET `/get-mail`
 
@@ -73,10 +73,10 @@ Gets mail from a non-Google user.
 
 ##### Query
 
-|                 `key`                 |               `id`               |
-| :-----------------------------------: | :------------------------------: |
-|                String                 |              String              |
-| A key that authorizes the connection. | Mongo ID of the non-Google user. |
+|               `id`               |
+| :------------------------------: |
+|              String              |
+| Mongo ID of the non-Google user. |
 
 ### POST
 
@@ -84,10 +84,10 @@ Gets mail from a non-Google user.
 Logs in a returning user and generates a session.
 ##### Body
 
-|                 `key`                 |                        `username`                        |    `password`    |
-| :-----------------------------------: | :------------------------------------------------------: | :--------------: |
-|                String                 |                          String                          |      String      |
-| A key that authorizes the connection. | User's email. Make sure it does not end in `@gmail.com`. | User's password. |
+|                        `username`                        |    `password`    |
+| :------------------------------------------------------: | :--------------: |
+|                          String                          |      String      |
+| User's email. Make sure it does not end in `@gmail.com`. | User's password. |
 
 #### POST `/send`
 
@@ -95,8 +95,8 @@ Sends mail.
 
 ##### Query
 
-|                 `key`                 |                   `to`                    |         `subject`         |         `body`         |
-| :-----------------------------------: | :---------------------------------------: | :-----------------------: | :--------------------: |
-|                String                 |                  String                   |          String           |         String         |
-| A key that authorizes the connection. | The email address to send the message to. | The subject of the email. | The body of the email. |
+|                   `to`                    |         `subject`         |         `body`         |
+| :---------------------------------------: | :-----------------------: | :--------------------: |
+|                  String                   |          String           |         String         |
+| The email address to send the message to. | The subject of the email. | The body of the email. |
 

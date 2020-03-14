@@ -2,12 +2,12 @@ const router = require('express').Router();
 const passport = require('passport');
 const User = require('../../models/user');
 const CryptoJS = require('crypto-js');
-const verifyKey = require('../../middleware/verifyKey');
+const verifyHost = require('../../middleware/verifyHost');
 const verifyPassword = require('../../helper/verifyPassword');
 const { client, keys } = require('../../config/config.json');
 const decodeQuery = require('../../helper/decodeQuery');
 
-router.get('/', verifyKey, async (req, res) => {
+router.get('/', verifyHost, async (req, res) => {
   const query = decodeQuery(req.query);
   const raw = await User.findOne({ email: query.email });
   const user = raw ? raw : { email: query.email, password: null };

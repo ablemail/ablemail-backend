@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const verifyKey = require('../middleware/verifyKey');
+const verifyHost = require('../middleware/verifyHost');
 const { createTransport, sendMail } = require('../helper/nodemailer');
 
 router.post('/', async (req, res) => { // TODO: Add key
