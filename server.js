@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cookieSession = require('cookie-session');
+const session = require('express-session');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
@@ -13,11 +13,18 @@ const sendRoute = require('./routes/sendRoute');
 const app = express();
 const PORT = 8000 || process.env.PORT;
 
-app.use(cors());
+app.use(cors({
+  origin: client,
+  credentials: true
+}));
 
-app.use(cookieSession({
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-  keys: [keys.reqKey]
+app.use(session({
+  secret: keys.session,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  }
 }));
 
 app.use(passport.initialize());

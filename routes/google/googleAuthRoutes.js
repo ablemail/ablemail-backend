@@ -22,6 +22,6 @@ router.get('/', verifyHost, async (req, res) => {
 
 router.get('/redirect', passport.authenticate('google', { scope: ['profile', 'email', 'https://mail.google.com/'] }));
 
-router.get('/callback', passport.authenticate('google'), (req, res) => res.redirect(`${ client }/inbox/google/${ req.user.accessToken }`));
+router.get('/callback', passport.authenticate('google'), (req, res) => res.redirect(`${ client }/inbox/google`));
 
 module.exports = router;

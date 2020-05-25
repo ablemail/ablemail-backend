@@ -17,14 +17,7 @@ const createTransport = async userID => {
       config = {
         host: 'smtp.gmail.com',
         port: 465,
-        secureConnection: false,
-        secure: true,
-        ignoreTLS: false,
-        requireTLS: true,
-        auth,
-        tls: {
-          ciphers: 'SSLv3'
-        }
+        auth
       };
       break;
     case 'outlook.com':

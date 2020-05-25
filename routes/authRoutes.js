@@ -5,6 +5,7 @@ const User = require('../models/user');
 const CryptoJS = require('crypto-js');
 const { client, keys } = require('../config/config.json');
 const decodeQuery = require('../helper/decodeQuery');
+const cache = require('memory-cache');
 
 const googleAuthRoutes = require('./google/googleAuthRoutes');
 
@@ -22,18 +23,20 @@ router.get('/signup', verifyHost, (req, res) => {
         name: `${ query.first } ${ query.last }`,
         email: query.email,
         password: CryptoJS.AES.encrypt(query.pass, keys.cipherKey).toString()
-      }).save().then(newUser => res.redirect(`${ client }/inbox/${ newUser.id }`));
+      }).save().then(() => res.redirect(`${ client }/inbox`));
     }
   });
 });
 
-router.post('/other', (req, res, next) => passport.authenticate('local', (err, user) => { // TODO: Add key
+router.post('/other', verifyHost, (req, res, next) => passport.authenticate('local', (err, user) => {
   if (err) return next(err);
-  if (!user.user) return res.json({ message: 'failed to auth' });
-  req.logIn(user, err => {
+  if (!user) return res.json({ message: 'failed to auth' });
+  req.login(user, err => {
     if (err) return next(err);
-    return res.json(req.user.user.id);
+    return res.json(req.user.id);
   });
 })(req, res, next));
+
+router.get('/is-authed', verifyHost, (req, res) => res.json(!!cache.get('user')));
 
 module.exports = router;

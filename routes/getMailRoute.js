@@ -3,7 +3,7 @@ const verifyHost = require('../middleware/verifyHost');
 const imap = require('../helper/imap');
 const User = require('../models/user');
 const CryptoJS = require('crypto-js');
-const decodeQuery = require('../helper/decodeQuery');
+const cache = require('memory-cache');
 const { keys } = require('../config/config.json');
 
 const googleGetMailRoutes = require('./google/googleGetMailRoutes');
@@ -11,8 +11,7 @@ const googleGetMailRoutes = require('./google/googleGetMailRoutes');
 router.use('/google', googleGetMailRoutes);
 
 router.get('/', verifyHost, async (req, res) => {
-  const query = decodeQuery(req.query);
-  const user = await User.findById(query.id);
+  const user = await User.findById(cache.get('user'));
   const mail = await imap({
     user: user.email,
     password: CryptoJS.AES.decrypt(user.password, keys.cipherKey).toString(CryptoJS.enc.Utf8),

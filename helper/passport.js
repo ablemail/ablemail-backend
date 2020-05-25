@@ -1,12 +1,21 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const LocalStrategy = require('passport-local');
+const cache = require('memory-cache');
 const { google } = require('../config/config.json');
 const User = require('../models/user');
 const verifyPassword = require('./verifyPassword');
 
-passport.serializeUser((user, done) => done(null, user.user.id));
+passport.serializeUser(({ user, accessToken }, done) =>  {
+  if (accessToken) {
+    cache.put('user', accessToken);
+  } else {
+    cache.put('user', user.id);
+  }
+  done(null, user.id);
+});
 
+// BUG: Not called
 passport.deserializeUser((id, done) => User.findById(id).then(user => done(null, user)));
 
 passport.use('google', new GoogleStrategy(google, (accessToken, refreshToken, profile, done) => {
