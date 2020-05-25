@@ -37,6 +37,6 @@ router.post('/other', verifyHost, (req, res, next) => passport.authenticate('loc
   });
 })(req, res, next));
 
-router.get('/is-authed', verifyHost, (req, res) => res.json(!!cache.get('user')));
+router.get('/is-authed', verifyHost, (req, res) => res.json({ isAuthed: !!cache.get('user'), strategy: cache.get('strategy') }));
 
 module.exports = router;

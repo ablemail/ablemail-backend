@@ -9,8 +9,10 @@ const verifyPassword = require('./verifyPassword');
 passport.serializeUser(({ user, accessToken }, done) =>  {
   if (accessToken) {
     cache.put('user', accessToken);
+    cache.put('strategy', 'google');
   } else {
     cache.put('user', user.id);
+    cache.put('strategy', 'other');
   }
   done(null, user.id);
 });
