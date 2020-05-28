@@ -1,24 +1,13 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const LocalStrategy = require('passport-local');
-const cache = require('memory-cache');
 const { google } = require('../config/config.json');
 const User = require('../models/user');
 const verifyPassword = require('./verifyPassword');
 
-passport.serializeUser(({ user, accessToken }, done) =>  {
-  if (accessToken) {
-    cache.put('user', accessToken);
-    cache.put('strategy', 'google');
-  } else {
-    cache.put('user', user.id);
-    cache.put('strategy', 'other');
-  }
-  done(null, user.id);
-});
+passport.serializeUser(({ user, accessToken }, done) => done(null, { id: user.id, accessToken }));
 
-// BUG: Not called
-passport.deserializeUser((id, done) => User.findById(id).then(user => done(null, user)));
+passport.deserializeUser(({ id, accessToken }, done) => User.findById(id).then(user => done(null, { user, accessToken })));
 
 passport.use('google', new GoogleStrategy(google, (accessToken, refreshToken, profile, done) => {
   User.findOne({ email: profile.emails[0].value }).then(async currentUser => {
@@ -32,7 +21,7 @@ passport.use('google', new GoogleStrategy(google, (accessToken, refreshToken, pr
       new User({
         name: profile.displayName,
         email: profile.emails[0].value
-      }).save().then(newUser => done(null, newUser));
+      }).save().then(newUser => done(null, { newUser, accessToken }));
     }
   });
 }));
@@ -44,5 +33,3 @@ passport.use('local', new LocalStrategy((username, password, done) => {
     return done(null, { user });
   });
 }));
-
-module.exports = verifyPassword;

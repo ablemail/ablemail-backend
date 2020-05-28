@@ -5,11 +5,8 @@ const User = require('../models/user');
 const CryptoJS = require('crypto-js');
 const { client, keys } = require('../config/config.json');
 const decodeQuery = require('../helper/decodeQuery');
-const cache = require('memory-cache');
 
 const googleAuthRoutes = require('./google/googleAuthRoutes');
-
-require('../helper/passport');
 
 router.use('/google', googleAuthRoutes);
 
@@ -30,13 +27,16 @@ router.get('/signup', verifyHost, (req, res) => {
 
 router.post('/other', verifyHost, (req, res, next) => passport.authenticate('local', (err, user) => {
   if (err) return next(err);
-  if (!user) return res.json({ message: 'failed to auth' });
-  req.login(user, err => {
+  if (!user) return res.send('failed to auth');
+  req.logIn(user, err => {
     if (err) return next(err);
-    return res.json(req.user.id);
+    return res.end();
   });
 })(req, res, next));
 
-router.get('/is-authed', verifyHost, (req, res) => res.json({ isAuthed: !!cache.get('user'), strategy: cache.get('strategy') }));
+router.get('/is-authed', verifyHost, (req, res) => res.json({
+  isAuthed: !!req.user,
+  strategy: req.user && req.user.accessToken ? 'google' : 'other'
+}));
 
 module.exports = router;
