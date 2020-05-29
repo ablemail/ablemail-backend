@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const verifyHost = require('../middleware/verifyHost');
+const authCheck = require('../middleware/authCheck');
 const { createTransport, sendMail } = require('../helper/nodemailer');
 
-router.post('/', verifyHost, async (req, res) => {
+router.post('/', verifyHost, authCheck, async (req, res) => {
   const transport = await createTransport(req.user.user.id);
   const { sent } = await sendMail(req.user.user.id, transport, {
     to: req.body.to,
