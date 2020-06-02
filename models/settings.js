@@ -5,7 +5,7 @@ const Settings = mongoose.model('settings', mongoose.Schema({
   tts: Boolean,
   large: Boolean,
   dyslexia: Boolean,
-  whitelist: [String],
+  // whitelist: [String],
   help: String,
   contacts: [{
     name: String,
