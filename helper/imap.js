@@ -6,9 +6,9 @@ const imap = settings => new Promise((resolve, reject) => {
   let mail = [];
   i
     .once('ready', () => {
-      i.openBox('INBOX', true, (err, box) => {
+      i.openBox('INBOX', false, (err, box) => {
         if (err) console.error(err);
-        i.seq.fetch(`${ box.messages.total - 6 }:${ box.messages.total }`, { bodies: '' })
+        i.seq.fetch(`${ box.messages.total - 6 }:${ box.messages.total }`, { bodies: '', markSeen: true })
           .on('message', (msg, seqno) => msg.on('body', stream => {
             let buffer = '', count = 0;
             stream.on('data', chunk => {

@@ -37,7 +37,21 @@ router.get('/get-one', verifyHost, authCheck, async (req, res) => {
       Accept: 'application/json',
       Authorization: `Bearer ${ req.user.accessToken }`
     }
-  }))
+  }));
+});
+
+router.post('/read-one', verifyHost, authCheck, async (req, res) => {
+  const query = decodeQuery(req.query);
+  await axios.post(`https://www.googleapis.com/gmail/v1/users/me/messages/${ query.id }/modify?key=${ google.clientSecret }`, JSON.stringify({
+    removeLabelIds: ['UNREAD']
+  }), {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ req.user.accessToken }`
+    }
+  });
+  res.end();
 });
 
 module.exports = router;

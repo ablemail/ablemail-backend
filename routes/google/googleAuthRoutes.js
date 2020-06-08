@@ -20,7 +20,7 @@ router.get('/', verifyHost, async (req, res) => {
   }
 });
 
-router.get('/redirect', passport.authenticate('google', { scope: ['profile', 'email', 'https://mail.google.com/'] }));
+router.get('/redirect', passport.authenticate('google', { scope: ['profile', 'email', 'https://mail.google.com/', 'https://www.googleapis.com/auth/gmail.modify'] }));
 
 router.get('/callback', passport.authenticate('google'), (req, res) => res.redirect(`${ client }/inbox/google`));
 
