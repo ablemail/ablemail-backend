@@ -2,6 +2,7 @@ const router = require('express').Router();
 const verifyHost = require('../middleware/verifyHost');
 const authCheck = require('../middleware/authCheck');
 const Settings = require('../models/settings');
+const { createTransport, sendMail } = require('../helper/nodemailer');
 
 router.get('/', verifyHost, authCheck, (req, res) =>
   Settings.findOne({ uid: req.user.user.id }).then(currentSettings => {
@@ -27,6 +28,16 @@ router.post('/', verifyHost, authCheck, async (req, res) => {
   }
   await Settings.updateOne({ uid: req.user.user.id }, req.query);
   res.end();
+});
+
+router.post('/help', verifyHost, authCheck, async (req, res) => {
+  const transport = await createTransport(req.user.user.id);
+  const { sent } = await sendMail(req.user.user.id, transport, {
+    to: req.body.help,
+    subject: req.body.subject,
+    text: req.body.body
+  });
+  res.json({ sent });
 });
 
 module.exports = router;
