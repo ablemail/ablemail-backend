@@ -33,9 +33,9 @@ router.post('/', verifyHost, authCheck, async (req, res) => {
 router.post('/help', verifyHost, authCheck, async (req, res) => {
   const transport = await createTransport(req.user.user.id);
   const { sent } = await sendMail(req.user.user.id, transport, {
-    to: req.body.help,
-    subject: req.body.subject,
-    text: req.body.body
+    to: req.query.help,
+    subject: req.query.subject,
+    text: req.query.body
   });
   res.json({ sent });
 });
