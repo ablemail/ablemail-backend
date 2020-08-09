@@ -31,7 +31,7 @@ const createTransport = async userID => {
       break;
   }
 
-  return await nodemailer.createTransport(config);
+  return nodemailer.createTransport(config);
 };
 
 const sendMail = async (id, transport, mail) => {
