@@ -3,8 +3,14 @@ const passport = require('passport');
 const verifyHost = require('../middleware/verifyHost');
 const User = require('../models/user');
 const CryptoJS = require('crypto-js');
-const { client, keys } = require('../config/config.json');
 const decodeQuery = require('../helper/decodeQuery');
+
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const { client, keys } = PRODUCTION ? {
+  client: process.env.CLIENT,
+  keys: { cipherKey: require('crypto-random-string')({ length: 100, type: 'url-safe' }) }
+} : require('../config/config.json');
 
 const googleAuthRoutes = require('./google/googleAuthRoutes');
 

@@ -1,9 +1,18 @@
 const router = require('express').Router();
 const axios = require('axios');
-const { google } = require('../../config/config.json');
 const verifyHost = require('../../middleware/verifyHost');
 const authCheck = require('../../middleware/authCheck');
 const decodeQuery = require('../../helper/decodeQuery');
+
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const { google } = PRODUCTION ? {
+  google: {
+    clientID: process.env.GOOGLE_CLIENTID,
+    clientSecret: process.env.GOOGLE_CLIENTSECRET,
+    callbackURL: process.env.GOOGLE_CALLBACKURL
+  }
+} : require('../../config/config.json');
 
 router.get('/', verifyHost, authCheck, async (req, res) => {
   const data = await axios.get(`https://www.googleapis.com/gmail/v1/users/me/messages?key=${ google.clientSecret }`, {

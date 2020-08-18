@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const logger = require('morgan');
-const { mongodb, client, keys } = require('./config/config.json');
 
 const authRoutes = require('./routes/authRoutes');
 const getMailRoute = require('./routes/getMailRoute');
@@ -15,6 +14,13 @@ const settingsRoute = require('./routes/settingsRoute');
 
 const app = express();
 const PORT = 8000 || process.env.PORT;
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const { mongodb, client, keys } = PRODUCTION ? {
+  mongodb: { uri: process.env.MONGODB_URI },
+  client: process.env.CLIENT,
+  keys: { session: require('crypto-random-string')({ length: 10, type: 'url-safe' }) }
+} : require('./config/config.json');
 
 mongoose.connect(mongodb.uri, { useNewUrlParser: true, useUnifiedTopology: true });
 

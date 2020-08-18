@@ -4,8 +4,14 @@ const User = require('../../models/user');
 const CryptoJS = require('crypto-js');
 const verifyHost = require('../../middleware/verifyHost');
 const verifyPassword = require('../../helper/verifyPassword');
-const { client, keys } = require('../../config/config.json');
 const decodeQuery = require('../../helper/decodeQuery');
+
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const { client, keys } = PRODUCTION ? {
+  client: process.env.CLIENT,
+  keys: { cipherKey: require('crypto-random-string')({ length: 100, type: 'url-safe' }) }
+} : require('../../config/config.json');
 
 router.get('/', verifyHost, async (req, res) => {
   const query = decodeQuery(req.query);

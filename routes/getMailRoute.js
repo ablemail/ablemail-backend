@@ -3,7 +3,13 @@ const verifyHost = require('../middleware/verifyHost');
 const authCheck = require('../middleware/authCheck');
 const imap = require('../helper/imap');
 const CryptoJS = require('crypto-js');
-const { keys } = require('../config/config.json');
+
+
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const { keys } = PRODUCTION ? {
+    keys: { cipherKey: require('crypto-random-string')({ length: 100, type: 'url-safe' }) }
+  } : require('../config/config.json');
 
 const googleGetMailRoutes = require('./google/googleGetMailRoutes');
 

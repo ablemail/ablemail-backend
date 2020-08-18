@@ -1,9 +1,18 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const LocalStrategy = require('passport-local');
-const { google } = require('../config/config.json');
 const User = require('../models/user');
 const verifyPassword = require('./verifyPassword');
+
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const { google } = PRODUCTION ? {
+  google: {
+    clientID: process.env.GOOGLE_CLIENTID,
+    clientSecret: process.env.GOOGLE_CLIENTSECRET,
+    callbackURL: process.env.GOOGLE_CALLBACKURL
+  }
+} : require('../config/config.json');
 
 passport.serializeUser(({ user, accessToken }, done) => done(null, { id: user.id, accessToken }));
 

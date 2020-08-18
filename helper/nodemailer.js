@@ -1,7 +1,12 @@
 const nodemailer = require('nodemailer');
 const User = require('../models/user');
 const CryptoJS = require('crypto-js');
-const { keys } = require('../config/config.json');
+
+const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const { keys } = PRODUCTION ? {
+  keys: { cipherKey: require('crypto-random-string')({ length: 100, type: 'url-safe' }) }
+} : require('../config/config.json');
 
 const createTransport = async userID => {
   const user = await User.findById(userID);
